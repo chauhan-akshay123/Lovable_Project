@@ -1,5 +1,6 @@
 package com.akshay.projects.lovable.controllers;
 
+import com.akshay.projects.lovable.DTO.project.FileContentResponse;
 import com.akshay.projects.lovable.DTO.project.FileNode;
 import com.akshay.projects.lovable.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class FileController {
             @PathVariable String path
     ){
        Long userId = 1L;
-       return ResponseEntity.ok(FileService.getFileContent(projectId, path, userId));
+       return ResponseEntity.ok(fileService.getFileContent(projectId, path, userId));
     }
 
 }
