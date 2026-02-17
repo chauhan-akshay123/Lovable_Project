@@ -3,7 +3,9 @@ package com.akshay.projects.lovable.controllers;
 import com.akshay.projects.lovable.DTO.subscription.*;
 import com.akshay.projects.lovable.service.PlanService;
 import com.akshay.projects.lovable.service.SubscriptionService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +14,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping()
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BillingController {
 
-    private final PlanService planService;
-    private final SubscriptionService subscriptionService;
+    PlanService planService;
+    SubscriptionService subscriptionService;
 
     @GetMapping("/api/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans(){

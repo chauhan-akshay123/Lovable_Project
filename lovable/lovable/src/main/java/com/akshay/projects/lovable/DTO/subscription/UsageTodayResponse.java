@@ -1,9 +1,9 @@
 package com.akshay.projects.lovable.DTO.subscription;
 
 public record UsageTodayResponse(
-        int tokensUsed,
-        int tokensLimit,
-        int previewsRemaining,
-        int previewsLimit
+        Integer  tokensUsed,
+        Integer tokensLimit,
+        Integer previewsRemaining,
+        Integer previewsLimit
 ) {
 }
