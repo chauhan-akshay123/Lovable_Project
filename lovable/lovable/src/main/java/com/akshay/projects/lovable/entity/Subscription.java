@@ -12,7 +12,6 @@ import java.time.Instant;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
 public class Subscription {
 
  Long id;

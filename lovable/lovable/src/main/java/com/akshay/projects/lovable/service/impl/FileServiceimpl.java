@@ -3,9 +3,11 @@ package com.akshay.projects.lovable.service.impl;
 import com.akshay.projects.lovable.DTO.project.FileContentResponse;
 import com.akshay.projects.lovable.DTO.project.FileNode;
 import com.akshay.projects.lovable.service.FileService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class FileServiceimpl implements FileService {
 
     @Override

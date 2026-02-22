@@ -5,7 +5,9 @@ import com.akshay.projects.lovable.DTO.subscription.CheckoutResponse;
 import com.akshay.projects.lovable.DTO.subscription.PortalResponse;
 import com.akshay.projects.lovable.DTO.subscription.SubscriptionResponse;
 import com.akshay.projects.lovable.service.SubscriptionService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SubscriptionServiceimpl implements SubscriptionService {
 
     @Override

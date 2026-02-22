@@ -4,9 +4,11 @@ import com.akshay.projects.lovable.DTO.member.InviteMemberRequest;
 import com.akshay.projects.lovable.DTO.member.MemberResponse;
 import com.akshay.projects.lovable.DTO.member.UpdateMemberRoleRequest;
 import com.akshay.projects.lovable.service.ProjectMemberService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ProjectMemberServiceimpl implements ProjectMemberService {
 
     @Override
