@@ -3,7 +3,6 @@ package com.akshay.projects.lovable.controllers;
 import com.akshay.projects.lovable.DTO.member.InviteMemberRequest;
 import com.akshay.projects.lovable.DTO.member.MemberResponse;
 import com.akshay.projects.lovable.DTO.member.UpdateMemberRoleRequest;
-import com.akshay.projects.lovable.entity.ProjectMember;
 import com.akshay.projects.lovable.service.ProjectMemberService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
