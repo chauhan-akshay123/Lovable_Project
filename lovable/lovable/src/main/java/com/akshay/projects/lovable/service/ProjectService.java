@@ -11,7 +11,7 @@ public interface ProjectService {
 
     List<ProjectSummaryResponse> getUserProjects(Long userId);
 
-    Optional<ProjectResponse> getProjectbyId(Long id, Long userId);
+    ProjectResponse getProjectbyId(Long id, Long userId);
 
     ProjectResponse createProject(ProjectRequest request, Long userId);
 
