@@ -5,12 +5,13 @@ import com.akshay.projects.lovable.DTO.project.ProjectResponse;
 import com.akshay.projects.lovable.DTO.project.ProjectSummaryResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectService {
 
     List<ProjectSummaryResponse> getUserProjects(Long userId);
 
-    ProjectResponse getProjectbyId(Long id, Long userId);
+    Optional<ProjectResponse> getProjectbyId(Long id, Long userId);
 
     ProjectResponse createProject(ProjectRequest request, Long userId);
 
