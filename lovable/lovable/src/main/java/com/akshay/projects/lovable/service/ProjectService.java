@@ -5,7 +5,6 @@ import com.akshay.projects.lovable.DTO.project.ProjectResponse;
 import com.akshay.projects.lovable.DTO.project.ProjectSummaryResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProjectService {
 
@@ -17,5 +16,5 @@ public interface ProjectService {
 
     ProjectResponse updateProject(Long id, ProjectRequest request, Long userId);
 
-    Void softDelete(Long id, Long userId);
+    void softDelete(Long id, Long userId);
 }
