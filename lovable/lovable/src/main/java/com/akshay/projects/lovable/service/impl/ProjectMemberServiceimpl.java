@@ -12,6 +12,7 @@ import com.akshay.projects.lovable.repository.ProjectMemberRepository;
 import com.akshay.projects.lovable.repository.ProjectRepository;
 import com.akshay.projects.lovable.repository.UserRepository;
 import com.akshay.projects.lovable.service.ProjectMemberService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +25,7 @@ import java.util.List;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Transactional
 public class ProjectMemberServiceimpl implements ProjectMemberService {
 
     ProjectMemberRepository projectMemberRepository;
@@ -83,7 +85,20 @@ public class ProjectMemberServiceimpl implements ProjectMemberService {
 
     @Override
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request, Long userId) {
-        return null;
+        Project project = getAccessibleProjectById(projectId, userId);
+
+        if(!project.getOwner().getId().equals(userId)){
+            throw new RuntimeException("Not allowed");
+        }
+
+        ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
+        ProjectMember projectMember = projectMemberRepository.findById(projectMemberId).orElseThrow();
+
+        projectMember.setProjectRole(request.role());
+
+        projectMemberRepository.save(projectMember);
+
+        return projectMemberMapper.toProjectMemberResponseFromMember(projectMember);
     }
 
     @Override

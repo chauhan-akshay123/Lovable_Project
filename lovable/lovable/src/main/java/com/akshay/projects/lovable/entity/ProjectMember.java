@@ -28,6 +28,7 @@ public class ProjectMember {
    @MapsId("userId")
    User user;
 
+   @Enumerated(EnumType.STRING)
    ProjectRole projectRole;
 
    Instant invitedAt;
