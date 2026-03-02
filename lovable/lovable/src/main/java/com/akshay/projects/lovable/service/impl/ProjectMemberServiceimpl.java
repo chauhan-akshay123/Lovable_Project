@@ -7,6 +7,7 @@ import com.akshay.projects.lovable.entity.Project;
 import com.akshay.projects.lovable.entity.ProjectMember;
 import com.akshay.projects.lovable.entity.ProjectMemberId;
 import com.akshay.projects.lovable.entity.User;
+import com.akshay.projects.lovable.error.ResourceNotFoundException;
 import com.akshay.projects.lovable.mapper.ProjectMemberMapper;
 import com.akshay.projects.lovable.repository.ProjectMemberRepository;
 import com.akshay.projects.lovable.repository.ProjectRepository;

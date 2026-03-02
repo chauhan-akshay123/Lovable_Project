@@ -5,6 +5,7 @@ import com.akshay.projects.lovable.DTO.project.ProjectResponse;
 import com.akshay.projects.lovable.DTO.project.ProjectSummaryResponse;
 import com.akshay.projects.lovable.entity.Project;
 import com.akshay.projects.lovable.entity.User;
+import com.akshay.projects.lovable.error.ResourceNotFoundException;
 import com.akshay.projects.lovable.mapper.ProjectMapper;
 import com.akshay.projects.lovable.repository.ProjectRepository;
 import com.akshay.projects.lovable.repository.UserRepository;
@@ -79,9 +80,9 @@ public class ProjectServiceimpl implements ProjectService {
         projectRepository.save(project);
     }
 
-    ///  Utility Functions
+    //  Utility Functions
 
-    public Project getAccessibleProjectById(Long id, Long userId){
-        return projectRepository.findAccessibleProjectById(id, userId).orElseThrow();
+    public Project getAccessibleProjectById(Long projectId, Long userId){
+        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(() -> new ResourceNotFoundException("Project", projectId.toString()));
     }
 }
