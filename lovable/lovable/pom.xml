@@ -58,6 +58,13 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!--Security-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+
 		<!-- TEST -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
