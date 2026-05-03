@@ -1,6 +1,7 @@
 package com.akshay.projects.lovable.controllers;
 
 import com.akshay.projects.lovable.DTO.subscription.*;
+import com.akshay.projects.lovable.service.PaymentProcessor;
 import com.akshay.projects.lovable.service.PlanService;
 import com.akshay.projects.lovable.service.SubscriptionService;
 import lombok.AccessLevel;
@@ -19,6 +20,7 @@ public class BillingController {
 
     PlanService planService;
     SubscriptionService subscriptionService;
+    PaymentProcessor paymentProcessor;
 
     @GetMapping("/api/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans(){
@@ -31,17 +33,16 @@ public class BillingController {
         return ResponseEntity.ok(subscriptionService.getCurrentSubscription(userId));
     }
 
-    @PostMapping("/api/stripe/checkout")
+    @PostMapping("/api/payments/checkout")
     public ResponseEntity<CheckoutResponse> createCheckoutResponse(
             @RequestBody CheckoutRequest request
     ){
-        Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.createChekoutSessionUrl(request, userId));
+        return ResponseEntity.ok(paymentProcessor.createChekoutSessionUrl(request));
     }
 
-    @PostMapping("/api/stripe/portal")
+    @PostMapping("/api/payments/portal")
     public ResponseEntity<PortalResponse> openCustomerPortal(){
         Long userId = 1L;
-        return ResponseEntity.ok(subscriptionService.openCustomerPortal(userId));
+        return ResponseEntity.ok(paymentProcessor.openCustomerPortal(userId));
     }
 }
