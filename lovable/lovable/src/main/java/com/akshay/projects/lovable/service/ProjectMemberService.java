@@ -3,7 +3,6 @@ package com.akshay.projects.lovable.service;
 import com.akshay.projects.lovable.DTO.member.InviteMemberRequest;
 import com.akshay.projects.lovable.DTO.member.MemberResponse;
 import com.akshay.projects.lovable.DTO.member.UpdateMemberRoleRequest;
-import com.akshay.projects.lovable.entity.ProjectMember;
 
 import java.util.List;
 
@@ -14,5 +13,5 @@ public interface ProjectMemberService {
     MemberResponse inviteMember(Long projectId, InviteMemberRequest request);
     MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request);
 
-    void deleteProjectMember(Long projectId, Long memberId);
+    void removeProjectMember(Long projectId, Long memberId);
 }
