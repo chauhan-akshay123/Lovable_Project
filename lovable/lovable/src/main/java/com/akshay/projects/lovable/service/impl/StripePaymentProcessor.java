@@ -4,33 +4,49 @@ import com.akshay.projects.lovable.DTO.subscription.CheckoutRequest;
 import com.akshay.projects.lovable.DTO.subscription.CheckoutResponse;
 import com.akshay.projects.lovable.DTO.subscription.PortalResponse;
 import com.akshay.projects.lovable.entity.Plan;
+import com.akshay.projects.lovable.entity.User;
 import com.akshay.projects.lovable.error.ResourceNotFoundException;
 import com.akshay.projects.lovable.repository.PlanRepository;
+import com.akshay.projects.lovable.repository.UserRepository;
 import com.akshay.projects.lovable.security.AuthUtil;
 import com.akshay.projects.lovable.service.PaymentProcessor;
 import com.stripe.exception.StripeException;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StripePaymentProcessor implements PaymentProcessor {
 
     private final AuthUtil authUtil;
     private final PlanRepository planRepository;
+    private final UserRepository userRepository;
 
     @Value("${client.url}")
     private String frontendUrl;
 
     @Override
     public CheckoutResponse createChekoutSessionUrl(CheckoutRequest request) {
-        Plan plan = planRepository.findById(request.planId()).orElseThrow(() -> new ResourceNotFoundException("Plan", request.planId().toString()));
+
+        Plan plan = planRepository.findById(request.planId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Plan", request.planId().toString()));
+
         Long userId = authUtil.getCurrentUserId();
 
-        SessionCreateParams params = SessionCreateParams.builder()
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("user", userId.toString()));
+
+        SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                 .addLineItem(
                         SessionCreateParams.LineItem.builder()
                                 .setPrice(plan.getStripePriceId())
@@ -42,21 +58,37 @@ public class StripePaymentProcessor implements PaymentProcessor {
                         SessionCreateParams.SubscriptionData.builder()
                                 .setBillingMode(
                                         SessionCreateParams.SubscriptionData.BillingMode.builder()
-                                                .setType(SessionCreateParams.SubscriptionData.BillingMode.Type.FLEXIBLE)
+                                                .setType(
+                                                        SessionCreateParams.SubscriptionData
+                                                                .BillingMode.Type.FLEXIBLE
+                                                )
                                                 .build()
                                 )
                                 .build()
                 )
-                .setSuccessUrl(frontendUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}")
+                .setSuccessUrl(
+                        frontendUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}"
+                )
                 .setCancelUrl(frontendUrl + "/cancel.html")
                 .putMetadata("user_id", userId.toString())
-                .putMetadata("plan_id", plan.getId().toString())
-                .build();
+                .putMetadata("plan_id", plan.getId().toString());
 
-        try{
-            Session session = Session.create(params); // making api call to the stripe backend
+        try {
+
+            String stripeCustomerId = user.getStripeCustormerId();
+
+            if (stripeCustomerId == null || stripeCustomerId.isEmpty()) {
+                // New customer
+                paramsBuilder.setCustomerEmail(user.getUsername());
+
+            } else {
+                paramsBuilder.setCustomer(stripeCustomerId); // stripe customer Id
+            }
+
+            SessionCreateParams params = paramsBuilder.build();
+            Session session = Session.create(params);
             return new CheckoutResponse(session.getUrl());
-        } catch (StripeException e){
+        } catch (StripeException e) {
             throw new RuntimeException(e);
         }
     }
@@ -64,5 +96,10 @@ public class StripePaymentProcessor implements PaymentProcessor {
     @Override
     public PortalResponse openCustomerPortal(Long userId) {
         return null;
+    }
+
+    @Override
+    public void handleWebhookEvent(String type, StripeObject stripeObject, Map<String, String> metadata) {
+        log.info("type");
     }
 }
