@@ -14,4 +14,9 @@ public class SubscriptionServiceimpl implements SubscriptionService {
         return null;
     }
 
+    @Override
+    public void activateSubscription(Long userId, Long planId, String subscriptionId, String customerId) {
+
+    }
+
 }
