@@ -96,7 +96,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
     }
 
     @Override
-    public PortalResponse openCustomerPortal(Long userId) {
+    public PortalResponse openCustomerPortal() {
         return null;
     }
 
@@ -105,7 +105,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
         log.debug("handling stripe event: {}", type);
 
         switch (type) {
-            case "chekout.session.completed" -> handleCheckoutSessionCompleted((Session) stripeObject, metadata); // one-time, on checkout completed
+            case "checkout.session.completed" -> handleCheckoutSessionCompleted((Session) stripeObject, metadata); // one-time, on checkout completed
             case "customer.subscription.updated" -> handleCustomerSubscriptionUpdated((Subscription) stripeObject); // when user cancels, upgrades or any updates
             case "customer.subscription.deleted" -> handleCustomerSubscriptionDeleted((Subscription) stripeObject); // when subscription ends, revoke the access
             case "invoice.paid" -> handleInvoicePaid((Invoice) stripeObject); // when invoice is paid
@@ -159,16 +159,49 @@ public class StripePaymentProcessor implements PaymentProcessor {
     }
 
     private void handleCustomerSubscriptionDeleted(Subscription subscription) {
+         if(subscription == null) {
+             log.error("subscription object was null inside handleCustomerSubscriptionDeleted");
+             return;
+         }
 
+         subscriptionService.cancelSubscription(subscription.getId());
     }
 
     private void handleInvoicePaid(Invoice invoice) {
+        String subId = extractSubscriptionId(invoice);
+        if(subId == null) {
+            return;
+        }
+
+        try{
+            Subscription subscription = Subscription.retrieve(subId); // sdk calling the Stripe server
+            var item = subscription.getItems().getData().get(0);
+
+            Instant periodStart = toInstant(item.getCurrentPeriodStart());
+            Instant periodEnd = toInstant(item.getCurrentPeriodEnd());
+
+            subscriptionService.renewSubscriptionPeriod(
+                    subId,
+                    periodStart,
+                    periodEnd
+            );
+
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     private void handleInvoicePaymentFailed(Invoice invoice) {
+        String subId = extractSubscriptionId(invoice);
+        if(subId == null) {
+            return;
+        }
 
+        subscriptionService.markSubscriptionPastDue(subId);
     }
+
+    ///  // Utility methods
 
     private User getUser(Long userId) {
         User user = userRepository.findById(userId)
@@ -200,5 +233,15 @@ public class StripePaymentProcessor implements PaymentProcessor {
         return planRepository.findByStripePriceId(price.getId())
                 .map(Plan::getId)
                 .orElse(null);
+    }
+
+    private String extractSubscriptionId(Invoice invoice){
+        var parent = invoice.getParent();
+        if(parent == null) return null;
+
+        var subDetails = parent.getSubscriptionDetails();
+        if(subDetails == null) return null;
+
+        return subDetails.getSubscription();
     }
 }
