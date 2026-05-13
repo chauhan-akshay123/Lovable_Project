@@ -77,7 +77,7 @@ public class StripePaymentProcessor implements PaymentProcessor {
 
         try {
 
-            String stripeCustomerId = user.getStripeCustormerId();
+            String stripeCustomerId = user.getStripeCustomerId();
 
             if (stripeCustomerId == null || stripeCustomerId.isEmpty()) {
                 // New customer
@@ -126,8 +126,8 @@ public class StripePaymentProcessor implements PaymentProcessor {
         String customerId = session.getCustomer();
 
         User user = getUser(userId);
-        if(user.getStripeCustormerId() == null){
-            user.setStripeCustormerId(customerId);
+        if(user.getStripeCustomerId() == null){
+            user.setStripeCustomerId(customerId);
             userRepository.save(user);
         }
 

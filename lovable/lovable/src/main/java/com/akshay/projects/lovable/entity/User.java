@@ -30,7 +30,7 @@ public class User implements UserDetails {
      String name;
 
      @Column(unique = true)
-     String stripeCustormerId;
+     String stripeCustomerId;
 
      @CreationTimestamp
      Instant createdAt;
