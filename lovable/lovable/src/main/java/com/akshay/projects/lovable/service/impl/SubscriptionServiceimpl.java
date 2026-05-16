@@ -141,7 +141,6 @@ public class SubscriptionServiceimpl implements SubscriptionService {
         // Notify user via email
     }
 
-
     /// Utility Methods
 
     private User getUser(Long userId){
