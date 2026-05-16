@@ -8,6 +8,7 @@ import com.akshay.projects.lovable.enums.SubscriptionStatus;
 import com.akshay.projects.lovable.error.ResourceNotFoundException;
 import com.akshay.projects.lovable.mapper.SubscriptionMapper;
 import com.akshay.projects.lovable.repository.PlanRepository;
+import com.akshay.projects.lovable.repository.ProjectMemberRepository;
 import com.akshay.projects.lovable.repository.SubscriptionRepository;
 import com.akshay.projects.lovable.repository.UserRepository;
 import com.akshay.projects.lovable.security.AuthUtil;
@@ -30,6 +31,7 @@ public class SubscriptionServiceimpl implements SubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
     @Override
     public SubscriptionResponse getCurrentSubscription() {
@@ -139,6 +141,21 @@ public class SubscriptionServiceimpl implements SubscriptionService {
         subscriptionRepository.save(subscription);
 
         // Notify user via email
+    }
+    private final int FREE_TIER_PROJECTS_ALLOWED = 1;
+
+    @Override
+    public boolean canCreateNewProject() {
+        Long userId = authUtil.getCurrentUserId();
+        SubscriptionResponse currentSubscription = getCurrentSubscription();
+
+        int countOfOwnedProjects = projectMemberRepository.countProjectOwnedByUser(userId);
+
+        if(currentSubscription.plan() == null){
+            return countOfOwnedProjects < FREE_TIER_PROJECTS_ALLOWED;
+        }
+
+        return countOfOwnedProjects < currentSubscription.plan().maxProjects();
     }
 
     /// Utility Methods

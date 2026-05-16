@@ -8,6 +8,7 @@ import com.akshay.projects.lovable.entity.ProjectMember;
 import com.akshay.projects.lovable.entity.ProjectMemberId;
 import com.akshay.projects.lovable.entity.User;
 import com.akshay.projects.lovable.enums.ProjectRole;
+import com.akshay.projects.lovable.error.BadRequestException;
 import com.akshay.projects.lovable.error.ResourceNotFoundException;
 import com.akshay.projects.lovable.mapper.ProjectMapper;
 import com.akshay.projects.lovable.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.akshay.projects.lovable.repository.ProjectRepository;
 import com.akshay.projects.lovable.repository.UserRepository;
 import com.akshay.projects.lovable.security.AuthUtil;
 import com.akshay.projects.lovable.service.ProjectService;
+import com.akshay.projects.lovable.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +38,20 @@ public class ProjectServiceimpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+        if(subscriptionService.canCreateNewProject()){
+           throw new BadRequestException("User cannot create a New project with current Plan, Upgrade plan now");
+        }
+
         Long userId = authUtil.getCurrentUserId();
-        User owner = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", userId.toString())
-        );
+//        User owner = userRepository.findById(userId).orElseThrow(
+//                () -> new ResourceNotFoundException("User", userId.toString())
+//        );
+
+          User user = userRepository.getReferenceById(userId);
 
         Project project = Project.builder()
                 .name(request.name())
@@ -51,11 +60,11 @@ public class ProjectServiceimpl implements ProjectService {
 
         project = projectRepository.save(project);
 
-        ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(), owner.getId());
+        ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(), user.getId());
         ProjectMember projectMember = ProjectMember.builder()
                 .id(projectMemberId)
                 .projectRole(ProjectRole.OWNER)
-                .user(owner)
+                .user(user)
                 .acceptedAt(Instant.now())
                 .invitedAt(Instant.now())
                 .project(project)
